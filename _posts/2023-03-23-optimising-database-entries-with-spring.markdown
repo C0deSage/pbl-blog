@@ -160,9 +160,14 @@ The big no-go is the line `accountService.getAccountReference(song.getAccountId(
 Then I researched for a solution that actually works. Which are native sql statements and they look like this:
 
 ```java
-@Modifying
+    public interface AccountRepository extends JpaRepository<Account, Long> {
+
+    @Transactional
+    @Modifying
     @Query(value = "INSERT INTO account_songs VALUES (:accountId, :songId)", nativeQuery = true)
     void insertAccountSong(@Param("accountId") Long accountId, @Param("songId") Long songId);
+
+}
 ```
 
 I felt kind of bad to invest that many hours to get to that solution which are a few lines of code. I also felt really good finally solving it.
