@@ -4,7 +4,7 @@ title: "Optimising Database entries with spring/hibernate"
 ---
 My name is Bernhard Ballek and I decided to clone [LastFm](https://www.last.fm) which has some features behind a paywall. Futhermore the statistics are predefined and the user can't define them themself.
 
-The biggest problem was to optimise how the relationships got saved in my Database. I know, you may think that optimising something that is still in developement isn't smart since you don't know if it's needed. Nevertheless in this project I think it's one of the most important things to do as early as possible.
+The biggest problem was to optimise how the relationships got saved in my Database. In this project I use Spring with Hibernate. I know, you may think that optimising something that is still in developement isn't smart since you don't know if it's needed. Nevertheless in this project I think it's one of the most important things to do as early as possible.
 
 ## Requirements
 In the finished program:
@@ -66,7 +66,7 @@ public class Genre {
 }
 ```
 
-In order to save songs I started to write the endpoint in order to achieve that. I also took care that the `Genre` aren't duplicated in the Database via java logic to avoid filling it with unneccessary data.
+In order to save songs I started to write the endpoint in order to achieve that. I also implemented java logic so the `Genre` aren't duplicated in the Database to avoid filling it with unneccessary duplicated data:
 
 ```java
 public void saveSongs(List<Song> songs) {
@@ -94,13 +94,13 @@ public void saveSongs(List<Song> songs) {
 }
 ```
 
-The lines to save the song in the Database and get the connection to the account right looked like this (again simplified):
+The lines to save the song in the Database and to get the connection to the account right looked like this (again simplified):
 
 ```java
 public void saveSongs(List<Song> songs) {
     for (Song song : songs) {
         saveOne(song);
-        accountService.getAccountReference(song.getAccountId().get(0).getAccountId()).getSongs().add(song);
+        accountService.getAccountReference(song.getAccounts().get(0).getAccountId()).getSongs().add(song);
     }
 }
 ```
@@ -121,7 +121,6 @@ Then I researched for something that actually works. Which are native sql statem
     @Modifying
     @Query(value = "INSERT INTO account_songs VALUES (:accountId, :songId)", nativeQuery = true)
     void insertAccountSong(@Param("accountId") Long accountId, @Param("songId") Long songId);
-
 }
 ```
 
@@ -129,7 +128,7 @@ So the line `accountService.getAccountReference(song.getAccountId().get(0).getAc
 
 Native query refers to plain sql syntax, while queries are written in JPQL.
 
-I felt kind of bad investing many hours to get to that solution which are a few lines of code, though it also felt really good finally solving it!
+I wanted to solve the problem with the tools I already learned which in this case was not smart. Nevertheless it felt really good finally solving it and learning something new!
 
 
 Thanks for reading my blog!
